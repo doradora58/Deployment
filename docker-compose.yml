@@ -6,7 +6,7 @@ networks:
 
 services:
   order-management:
-    image: localhost:5000/order-management:latest
+    image: 192.168.1.148:5000/order-management:latest
     container_name: order-management
     restart: always
     ports:
@@ -18,7 +18,7 @@ services:
       - app-network
 
   fms:
-    image: localhost:5000/fms:latest
+    image: 192.168.1.148:5000/fms:latest
     container_name: fms
     restart: always
     ports:
