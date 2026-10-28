@@ -27,3 +27,14 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
     networks:
       - app-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    restart: always
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks:
+      - app-network
