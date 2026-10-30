@@ -13,3 +13,7 @@ scrape_configs:
   - job_name: 'fms'
     static_configs:
       - targets: ['fms:8080']
+
+  - job_name: 'raspberry-pi'
+    static_configs:
+      - targets: ['node-exporter:9100']
