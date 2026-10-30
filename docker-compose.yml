@@ -11,7 +11,7 @@ volumes:
     driver: local
   loki_data:
     driver: local
-    
+
 services:
   order-management:
     image: 192.168.1.148:5000/order-management:latest
@@ -96,7 +96,7 @@ services:
     networks:
       - app-network
 
-promtail:
+  promtail:
     image: grafana/promtail:latest
     container_name: promtail
     restart: always
