@@ -13,7 +13,7 @@ services:
       - "9000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - FMS_API_URL=fms/api/dispatch
+      - FMS_API_URL=http://fms:8080/api/dispatch
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     networks:
       - app-network

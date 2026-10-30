@@ -1,0 +1,20 @@
+name: Deploy to Raspberry Pi
+
+on:
+  push:
+    branches: [ main , develop ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Pull latest images and restart containers
+        run: |
+          cd ~/Deployment
+          docker compose pull
+          docker compose up -d --remove-orphans
