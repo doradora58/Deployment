@@ -16,5 +16,5 @@ jobs:
       - name: Pull latest images and restart containers
         run: |
           cd ~/Deployment
-          docker compose pull
-          docker compose up -d --remove-orphans
+          docker compose pull --include-deps
+          docker compose up -d --force-recreate --remove-orphans
