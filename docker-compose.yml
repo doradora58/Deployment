@@ -23,6 +23,9 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - FMS_API_URL=http://fms:8080/api/transportjob/create
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - RabbitMQ__HostName=rabbitmq
+    depends_on:
+      - rabbitmq
     networks:
       - app-network
 
@@ -35,7 +38,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - RabbitMQ__HostName=rabbitmq
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317    
+    depends_on:
+      - rabbitmq
     networks:
       - app-network
 
