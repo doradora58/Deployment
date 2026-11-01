@@ -21,7 +21,7 @@ services:
       - "9000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - FMS_API_URL=http://fms:8080/api/dispatch
+      - FMS_API_URL=http://fms:8080/api/transportjob/create
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     networks:
       - app-network
@@ -34,6 +34,7 @@ services:
       - "9020:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - RabbitMQ__HostName=rabbitmq
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
     networks:
       - app-network
@@ -106,3 +107,20 @@ services:
     command: -config.file=/etc/promtail/config.yml
     networks:
       - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
