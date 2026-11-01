@@ -11,6 +11,7 @@ volumes:
     driver: local
   loki_data:
     driver: local
+  mongo_data:
 
 services:
   order-management:
@@ -38,9 +39,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - RabbitMQ__HostName=rabbitmq
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317    
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=FmsDb
     depends_on:
       - rabbitmq
+      - mongo
     networks:
       - app-network
 
@@ -129,3 +133,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  mongo:
+    image: mongo:latest
+    container_name: fms-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
