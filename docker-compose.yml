@@ -42,8 +42,8 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=FmsDb
-      - GoogleMaps__ApiKey=${GOOGLE_MAPS_API_KEY}
-      - GoogleMaps__JavaScriptApiKey=${GOOGLE_MAPS_BROWSER_KEY}
+      - GoogleMaps__ApiKey=${GOOGLE_MAPS_API_KEY:?Set GOOGLE_MAPS_API_KEY in .env}
+      - GoogleMaps__JavaScriptApiKey=${GOOGLE_MAPS_BROWSER_KEY:?Set GOOGLE_MAPS_BROWSER_KEY in .env}
     depends_on:
       - rabbitmq
       - mongo
