@@ -45,8 +45,10 @@ services:
       - GoogleMaps__ApiKey=${GOOGLE_MAPS_API_KEY:?Set GOOGLE_MAPS_API_KEY in .env}
       - GoogleMaps__JavaScriptApiKey=${GOOGLE_MAPS_BROWSER_KEY:?Set GOOGLE_MAPS_BROWSER_KEY in .env}
     depends_on:
-      - rabbitmq
-      - mongo
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -145,3 +147,9 @@ services:
       - mongo_data:/data/db
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
