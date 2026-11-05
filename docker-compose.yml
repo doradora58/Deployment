@@ -25,6 +25,8 @@ services:
       - FMS_API_URL=http://fms:8080/api/transportjob/create
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      - RabbitMQ__Password=${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
     depends_on:
       - rabbitmq
     networks:
@@ -39,15 +41,47 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      - RabbitMQ__Password=${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=FmsDb
       - GoogleMaps__ApiKey=${GOOGLE_MAPS_API_KEY:?Set GOOGLE_MAPS_API_KEY in .env}
       - GoogleMaps__JavaScriptApiKey=${GOOGLE_MAPS_BROWSER_KEY:?Set GOOGLE_MAPS_BROWSER_KEY in .env}
+      - Vda5050__Enabled=true
+      - Vda5050__TopicRoot=uagv/v2
+      - Vda5050__Broker__Host=rabbitmq
+      - Vda5050__Broker__Port=1883
+      - Vda5050__Broker__Username=${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      - Vda5050__Broker__Password=${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+      - Vda5050__Broker__UseTls=false
     depends_on:
       rabbitmq:
         condition: service_healthy
       mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  auto-vehicle-emulator:
+    image: ${REGISTRY_HOST:-192.168.1.148:5000}/auto-vehicle-emulator:latest
+    container_name: auto-vehicle-emulator
+    restart: always
+    ports:
+      - "9030:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - VehicleEmulator__Manufacturer=${VEHICLE_MANUFACTURER:-Example}
+      - VehicleEmulator__SerialNumber=${VEHICLE_SERIAL_NUMBER:-AGV-001}
+      - VehicleEmulator__TopicRoot=uagv/v2
+      - VehicleEmulator__BrokerHost=rabbitmq
+      - VehicleEmulator__BrokerPort=1883
+      - VehicleEmulator__Username=${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      - VehicleEmulator__Password=${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+      - VehicleEmulator__UseTls=false
+      - VehicleEmulator__PublishIntervalMilliseconds=${VEHICLE_PUBLISH_INTERVAL_MS:-2000}
+    depends_on:
+      rabbitmq:
         condition: service_healthy
     networks:
       - app-network
@@ -127,9 +161,14 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+      - "1883:1883"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?Set RABBITMQ_DEFAULT_USER in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?Set RABBITMQ_DEFAULT_PASS in .env}
+    command:
+      - sh
+      - -c
+      - rabbitmq-plugins enable --offline rabbitmq_mqtt && exec rabbitmq-server
     networks:
       - app-network
     healthcheck:
